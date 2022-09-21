@@ -18,6 +18,7 @@ function MoviesList(props) {
           return (
             <MovieItem
               key={movie.key}
+              id={movie._id}
               movie={movie}
               onDelete={props.onDelete}
             />
