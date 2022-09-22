@@ -21,6 +21,7 @@ function MoviesList(props) {
               id={movie._id}
               movie={movie}
               onDelete={props.onDelete}
+              onLikeClicked={props.onLikeClicked}
             />
           );
         })}
