@@ -7,6 +7,8 @@ import { useEffect, useState } from "react";
 import Pagination from "./components/common/pagination";
 import { paginate } from "./utils/paginator";
 import ListGroup from "./components/common/listgroup";
+import _, { filter } from "lodash";
+
 function App(props) {
   const [latestMovies, setMovies] = useState(getMovies());
   const [pageSize, setPageSize] = useState(4);
@@ -14,14 +16,28 @@ function App(props) {
 
   const [genres, setGenres] = useState(getGenres());
   const [currentGenre, setCurrentGenre] = useState({});
+  const [sortColumn, setSortColumn] = useState({
+    path: "title",
+    order: "asc",
+  });
 
   let allGenres = [{ name: "All Genres" }, ...genres];
-  const filteredMovies =
-    currentGenre && currentGenre._id
-      ? latestMovies.filter((movie) => movie.genre._id === currentGenre._id)
-      : latestMovies;
 
-  const pagedMovies = paginate(filteredMovies, currentPage, pageSize);
+  function getPagedData() {
+    const filteredMovies =
+      currentGenre && currentGenre._id
+        ? latestMovies.filter((movie) => movie.genre._id === currentGenre._id)
+        : latestMovies;
+
+    const sorted = _.orderBy(
+      filteredMovies,
+      [sortColumn.path],
+      [sortColumn.order]
+    );
+    const pagedMovies = paginate(sorted, currentPage, pageSize);
+
+    return { totalCount: filteredMovies.length, data: pagedMovies };
+  }
 
   function handleOnDelete(movieId) {
     deleteMovie(movieId);
@@ -42,40 +58,44 @@ function App(props) {
   }
 
   function handleOnGenreChange(genre) {
-    console.log(genre);
     setCurrentGenre(genre);
   }
 
-  if (pagedMovies.length === 0) {
-    return <p>Showing {pagedMovies.length} movies in the database</p>;
-  } else {
-    return (
-      <main className="container row m-5">
-        <div className="col-2">
-          <ListGroup
-            items={allGenres}
-            currentItem={currentGenre}
-            onItemSelected={handleOnGenreChange}
-          />
-        </div>
-        <div className="col">
-          <p>Showing {filteredMovies.length} movies in the database</p>
-          <MoviesList
-            movies={pagedMovies}
-            onDelete={handleOnDelete}
-            onLike={handleOnLike}
-            onLikeClicked={handleOnLike}
-          />
-          <Pagination
-            itemsCount={filteredMovies.length}
-            pageSize={pageSize}
-            onPageChange={handleOnPageChange}
-            currentPage={currentPage}
-          />
-        </div>
-      </main>
-    );
+  function handleSort(sColumn) {
+    setSortColumn(sColumn);
   }
+
+  const { totalCount, data: movies } = getPagedData();
+  if (latestMovies.length === 0) return <p>No movies in the database</p>;
+
+  return (
+    <main className="container row m-5">
+      <div className="col-2">
+        <ListGroup
+          items={allGenres}
+          currentItem={currentGenre}
+          onItemSelected={handleOnGenreChange}
+        />
+      </div>
+      <div className="col">
+        <p>Showing {totalCount} movies in the database</p>
+        <MoviesList
+          movies={movies}
+          onDelete={handleOnDelete}
+          onLike={handleOnLike}
+          onLikeClicked={handleOnLike}
+          onSort={handleSort}
+          sortColumn={sortColumn}
+        />
+        <Pagination
+          itemsCount={totalCount}
+          pageSize={pageSize}
+          onPageChange={handleOnPageChange}
+          currentPage={currentPage}
+        />
+      </div>
+    </main>
+  );
 }
 
 export default App;

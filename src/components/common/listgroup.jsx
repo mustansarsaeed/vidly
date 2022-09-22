@@ -8,7 +8,7 @@ function ListGroup(props) {
       {items.map((item) => {
         return (
           <li
-            key={item[valueProperty]}
+            key={item[textProperty]}
             className={
               currentItem._id === item[valueProperty]
                 ? "list-group-item active"
