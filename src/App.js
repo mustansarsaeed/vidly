@@ -8,6 +8,7 @@ import Pagination from "./components/common/pagination";
 import { paginate } from "./utils/paginator";
 import ListGroup from "./components/common/listgroup";
 import _, { filter } from "lodash";
+import NavBar from "./components/navbar";
 
 function App(props) {
   const [latestMovies, setMovies] = useState(getMovies());
