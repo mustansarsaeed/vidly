@@ -1,17 +1,18 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import App from "./App";
-import "bootstrap/dist/css/bootstrap.css";
-import "font-awesome/css/font-awesome.css";
-import NavBar from "./components/navbar";
 import { BrowserRouter, Switch, Route, Redirect } from "react-router-dom";
-import MoviesList from "./components/MoviesList";
+
+import App from "./App";
+import NavBar from "./components/navbar";
 import Customers from "./components/customers";
 import Rentals from "./components/rentals";
 import NotFound from "./components/notFound";
 import MovieForm from "./components/movieForm";
+import LoginForm from "./components/loginForm";
 
 import "./index.css";
+import "bootstrap/dist/css/bootstrap.css";
+import "font-awesome/css/font-awesome.css";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
@@ -19,6 +20,7 @@ root.render(
     <div>
       <NavBar />
       <Switch>
+        <Route path="/login" component={LoginForm} />
         <Route path="/movies/:id" component={MovieForm} />
         <Route path="/movies" component={App} />
         <Route path="/customers" component={Customers} />

@@ -1,14 +1,13 @@
-import logo from "./logo.svg";
-import "./App.css";
 import MoviesList from "./components/MoviesList";
 import { getMovies, deleteMovie, getMovie } from "./services/fakeMovieService";
 import { getGenres } from "./services/fakeGenreService";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Pagination from "./components/common/pagination";
 import { paginate } from "./utils/paginator";
 import ListGroup from "./components/common/listgroup";
-import _, { filter } from "lodash";
-import NavBar from "./components/navbar";
+import _ from "lodash";
+
+import "./App.css";
 
 function App(props) {
   const [latestMovies, setMovies] = useState(getMovies());
