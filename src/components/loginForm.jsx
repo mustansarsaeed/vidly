@@ -1,5 +1,6 @@
 import React, { Component, useEffect, useState } from "react";
 import Input from "./common/input";
+import Joi from "joi-browser";
 
 function LoginForm() {
   const [account, setAccount] = useState({
@@ -11,6 +12,11 @@ function LoginForm() {
     username: "",
     password: "",
   });
+
+  const schema = {
+    username: Joi.string().required().label("Username"),
+    password: Joi.string().required().label("Password"),
+  };
 
   function handleSubmit(e) {
     e.preventDefault();
@@ -26,40 +32,34 @@ function LoginForm() {
     const cErrors = { ...errors };
     const errorMessage = validateProperty(input);
 
-    if (errorMessage.length == 0) {
-      delete cErrors[input.name];
-    } else {
-      cErrors[input.name] = errorMessage;
-    }
-
-    setErrors(cErrors);
+    if (errorMessage) cErrors[input.name] = errorMessage;
+    else delete cErrors[input.name];
 
     const newAccount = { ...account };
     newAccount[input.name] = input.value;
     setAccount(newAccount);
+
+    console.log("newAccount=", newAccount);
+    console.log("cErrors=", cErrors);
+    setErrors(cErrors);
   }
 
   function validate() {
-    const vErrors = {};
-    if (account.username.trim().length === 0)
-      vErrors.username = "Username field is requried.";
+    const options = { abortEarly: false };
+    const { error } = Joi.validate(account, schema, options);
+    if (!error) return null;
+    const cErrors = {};
+    for (let item of error.details) cErrors[item.path[0]] = item.message;
 
-    if (account.password.trim().length === 0)
-      vErrors.password = "Password field is requried.";
-
-    return Object.keys(vErrors).length === 0 ? null : vErrors;
+    return cErrors;
   }
 
   function validateProperty({ name, value }) {
-    if (name === "username") {
-      if (value.trim().length === 0) return "Username is required";
-    }
+    const obj = { [name]: value };
+    const subSchema = { [name]: schema[name] };
+    const { error } = Joi.validate(obj, subSchema);
 
-    if (name === "password") {
-      if (value.trim().length === 0) return "Password is required";
-    }
-
-    return "";
+    return error ? error.details[0].message : null;
   }
 
   const username = React.createRef();
@@ -84,7 +84,9 @@ function LoginForm() {
           onChange={handleOnChange}
         />
 
-        <button className="btn btn-primary">Login</button>
+        <button disabled={validate()} className="btn btn-primary">
+          Login
+        </button>
       </form>
     </div>
   );
