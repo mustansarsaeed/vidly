@@ -1,5 +1,7 @@
 import React, { Component } from "react";
 import Joi from "joi-browser";
+import Input from "./input";
+import Select from "./select";
 
 export function handleSubmit(e, data, schema) {
   e.preventDefault();
@@ -37,4 +39,45 @@ export function validateProperty({ name, value }, schema) {
   const { error } = Joi.validate(obj, subSchema);
 
   return error ? error.details[0].message : null;
+}
+
+export function renderButton(label, isDisabled) {
+  return (
+    <button disabled={isDisabled} className="btn btn-primary">
+      {label}
+    </button>
+  );
+}
+
+export function renderInput(
+  name,
+  label,
+  data,
+  errors,
+  doHandle,
+  type = "text"
+) {
+  return (
+    <Input
+      type={type}
+      name={name}
+      label={label}
+      value={data[name]}
+      error={errors !== null ? errors[name] : null}
+      onChange={doHandle}
+    />
+  );
+}
+
+export function renderSelect(name, label, data, errors, doHandle, options) {
+  return (
+    <Select
+      name={name}
+      label={label}
+      value={data[name]}
+      options={options}
+      error={errors !== null ? errors[name] : null}
+      onChange={doHandle}
+    />
+  );
 }

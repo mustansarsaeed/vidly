@@ -8,6 +8,7 @@ import ListGroup from "./components/common/listgroup";
 import _ from "lodash";
 
 import "./App.css";
+import { NavLink } from "react-router-dom";
 
 function App(props) {
   const [latestMovies, setMovies] = useState(getMovies());
@@ -65,6 +66,8 @@ function App(props) {
     setSortColumn(sColumn);
   }
 
+  function createNewMovie() {}
+
   const { totalCount, data: movies } = getPagedData();
   if (latestMovies.length === 0) return <p>No movies in the database</p>;
 
@@ -78,6 +81,10 @@ function App(props) {
         />
       </div>
       <div className="col">
+        <NavLink className="btn btn-primary btn-sm m-2" to="/movies/new">
+          New Movie
+        </NavLink>
+
         <p>Showing {totalCount} movies in the database</p>
         <MoviesList
           movies={movies}

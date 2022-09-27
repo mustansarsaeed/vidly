@@ -13,6 +13,7 @@ import LoginForm from "./components/loginForm";
 import "./index.css";
 import "bootstrap/dist/css/bootstrap.css";
 import "font-awesome/css/font-awesome.css";
+import RegisterForm from "./components/registerForm";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
@@ -20,7 +21,9 @@ root.render(
     <div>
       <NavBar />
       <Switch>
+        <Route path="/movies/new" component={MovieForm} />
         <Route path="/login" component={LoginForm} />
+        <Route path="/register" component={RegisterForm} />
         <Route path="/movies/:id" component={MovieForm} />
         <Route path="/movies" component={App} />
         <Route path="/customers" component={Customers} />

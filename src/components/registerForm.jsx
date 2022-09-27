@@ -8,23 +8,26 @@ import {
   renderInput,
 } from "./common/form";
 
-function LoginForm() {
+function RegisterForm() {
   const [account, setAccount] = useState({
     username: "",
     password: "",
+    name: "",
   });
 
   const [errors, setErrors] = useState({
     username: "",
     password: "",
+    name: "",
   });
 
   const schema = {
-    username: Joi.string().required().label("Username"),
-    password: Joi.string().required().label("Password"),
+    username: Joi.string().email().required().label("Username"),
+    password: Joi.string().min(5).required().label("Password"),
+    name: Joi.string().required().label("Name"),
   };
 
-  function doSubmit(e) {
+  function doRegister(e) {
     const validatedErrors = handleSubmit(e, account, schema);
     setErrors(validatedErrors);
 
@@ -40,7 +43,7 @@ function LoginForm() {
   return (
     <div className="container">
       <h1>Login</h1>
-      <form onSubmit={doSubmit}>
+      <form onSubmit={doRegister}>
         {renderInput("username", "Username", account, errors, doHandle)}
         {renderInput(
           "password",
@@ -50,10 +53,11 @@ function LoginForm() {
           doHandle,
           "password"
         )}
-        {renderButton("Login", validate(account, schema))}
+        {renderInput("name", "Name", account, errors, doHandle)}
+        {renderButton("Register", validate(account, schema))}
       </form>
     </div>
   );
 }
 
-export default LoginForm;
+export default RegisterForm;
