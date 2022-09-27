@@ -1,6 +1,7 @@
 import React, { Component, useEffect, useState } from "react";
 import Input from "./common/input";
 import Joi from "joi-browser";
+import { handleOnChange, handleSubmit, validate } from "./common/form";
 
 function LoginForm() {
   const [account, setAccount] = useState({
@@ -18,48 +19,17 @@ function LoginForm() {
     password: Joi.string().required().label("Password"),
   };
 
-  function handleSubmit(e) {
-    e.preventDefault();
-
-    const validatedErrors = validate();
-    console.log(validatedErrors);
+  function doSubmit(e) {
+    const validatedErrors = handleSubmit(e, account, schema);
     setErrors(validatedErrors);
 
     if (validatedErrors) return;
   }
 
-  function handleOnChange({ currentTarget: input }) {
-    const cErrors = { ...errors };
-    const errorMessage = validateProperty(input);
-
-    if (errorMessage) cErrors[input.name] = errorMessage;
-    else delete cErrors[input.name];
-
-    const newAccount = { ...account };
-    newAccount[input.name] = input.value;
-    setAccount(newAccount);
-
-    console.log("newAccount=", newAccount);
-    console.log("cErrors=", cErrors);
-    setErrors(cErrors);
-  }
-
-  function validate() {
-    const options = { abortEarly: false };
-    const { error } = Joi.validate(account, schema, options);
-    if (!error) return null;
-    const cErrors = {};
-    for (let item of error.details) cErrors[item.path[0]] = item.message;
-
-    return cErrors;
-  }
-
-  function validateProperty({ name, value }) {
-    const obj = { [name]: value };
-    const subSchema = { [name]: schema[name] };
-    const { error } = Joi.validate(obj, subSchema);
-
-    return error ? error.details[0].message : null;
+  function doHandle({ currentTarget: input }) {
+    const { error, data } = handleOnChange(input, errors, account, schema);
+    setAccount(data);
+    setErrors(error);
   }
 
   const username = React.createRef();
@@ -67,13 +37,13 @@ function LoginForm() {
   return (
     <div className="container">
       <h1>Login</h1>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={doSubmit}>
         <Input
           name="username"
           label="Username"
           value={account.username}
           error={errors !== null ? errors.username : null}
-          onChange={handleOnChange}
+          onChange={doHandle}
         />
 
         <Input
@@ -81,10 +51,13 @@ function LoginForm() {
           label="Password"
           value={account.password}
           error={errors !== null ? errors.password : null}
-          onChange={handleOnChange}
+          onChange={doHandle}
         />
 
-        <button disabled={validate()} className="btn btn-primary">
+        <button
+          disabled={validate(account, schema)}
+          className="btn btn-primary"
+        >
           Login
         </button>
       </form>
