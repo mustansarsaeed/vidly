@@ -9,6 +9,9 @@ import _ from "lodash";
 
 import "./App.css";
 import { NavLink } from "react-router-dom";
+import Input from "./components/common/input";
+import { renderInput } from "./components/common/form";
+import SearchBox from "./components/common/searchBox";
 
 function App(props) {
   const [latestMovies, setMovies] = useState(getMovies());
@@ -17,6 +20,7 @@ function App(props) {
 
   const [genres, setGenres] = useState(getGenres());
   const [currentGenre, setCurrentGenre] = useState({});
+  const [searchQuery, setSearchQuery] = useState("");
   const [sortColumn, setSortColumn] = useState({
     path: "title",
     order: "asc",
@@ -25,10 +29,18 @@ function App(props) {
   let allGenres = [{ name: "All Genres" }, ...genres];
 
   function getPagedData() {
-    const filteredMovies =
-      currentGenre && currentGenre._id
-        ? latestMovies.filter((movie) => movie.genre._id === currentGenre._id)
-        : latestMovies;
+    const filteredMovies = latestMovies;
+
+    if (searchQuery) {
+      filteredMovies = latestMovies.filter((m) =>
+        m.title.toLowerCase().startsWith(searchQuery.toLowerCase())
+      );
+    } else {
+      filteredMovies =
+        currentGenre && currentGenre._id
+          ? latestMovies.filter((movie) => movie.genre._id === currentGenre._id)
+          : latestMovies;
+    }
 
     const sorted = _.orderBy(
       filteredMovies,
@@ -66,7 +78,11 @@ function App(props) {
     setSortColumn(sColumn);
   }
 
-  function createNewMovie() {}
+  function handleSearch(query) {
+    setCurrentGenre({});
+    setSearchQuery(query);
+    setCurrentPage(1);
+  }
 
   const { totalCount, data: movies } = getPagedData();
   if (latestMovies.length === 0) return <p>No movies in the database</p>;
@@ -86,6 +102,9 @@ function App(props) {
         </NavLink>
 
         <p>Showing {totalCount} movies in the database</p>
+
+        <SearchBox value={searchQuery} onChange={handleSearch} />
+
         <MoviesList
           movies={movies}
           onDelete={handleOnDelete}
